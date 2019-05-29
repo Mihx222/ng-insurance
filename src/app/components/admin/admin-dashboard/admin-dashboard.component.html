@@ -1,0 +1,404 @@
+  <div class="container mt-3">
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <a class="nav-item nav-link active" id="nav-pending-tab" data-toggle="tab" href="#nav-pending" role="tab"
+       aria-controls="nav-pending" aria-selected="true">Pending orders</a>
+    <a class="nav-item nav-link" id="nav-history-tab" data-toggle="tab" href="#nav-history" role="tab"
+       aria-controls="nav-history" aria-selected="false">History</a>
+  </div>
+
+  <div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-pending" role="tabpanel" aria-labelledby="nav-pending-tab">
+      <div class="d-flex">
+        <div class="mr-auto p-2 mt-2">
+          <form class="form-inline">
+            <label class="mr-2" for="pendingSearchInput">Search:</label>
+            <input
+              [(ngModel)]="pendingSearchText"
+              class="form-control"
+              id="pendingSearchInput"
+              name="pendingSearchInput"
+              placeholder="Insert any text"
+              type="text"
+            >
+          </form>
+        </div>
+
+        <div class="mr-auto p-2 align-items-center mt-sm-2">
+          <pagination-controls (pageChange)="p1 = $event" id="first"></pagination-controls>
+        </div>
+
+        <div class="p-2 mt-2">
+          <form class="form-inline">
+            <div class="input-group">
+              <label class="mr-2" for="pendingOrdersSortBySelect">Sort by:</label>
+              <select
+                [(ngModel)]="sortingMethod"
+                class="form-control"
+                id="pendingOrdersSortBySelect"
+                name="sortBySelect"
+              >
+                <option>Date</option>
+              </select>
+            </div>
+
+            <div class="input-group mx-3">
+              <label class="mr-2" for="pendingOrdersOrderSelect">Order:</label>
+              <select
+                [(ngModel)]="orderMethod"
+                class="form-control"
+                id="pendingOrdersOrderSelect"
+                name="orderSelect"
+              >
+                <option>Ascending</option>
+                <option>Descending</option>
+              </select>
+            </div>
+
+            <button (click)="dateSort(pendingOrders)" class="btn btn-primary btn-sm">Sort</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="d-flex flex-row flex-wrap">
+        <div *ngIf="pendingOrders === undefined || pendingOrders.length === 0" class="mx-5 my-3">
+          No orders.
+        </div>
+        <div
+          *ngFor="let order of (pendingOrders | filter: pendingSearchText | paginate: { itemsPerPage: 9, currentPage: p1, id: 'first' })"
+          class="card card-block col-md-4 my-2">
+          <div class="card-header mt-3">
+            <div class="card-text float-left text-muted">#{{order.id}}</div>
+            <div class="card-text float-right text-muted">{{order.time_created | date: 'medium'}}</div>
+          </div>
+          <div class="card-body">
+            <dl class="row">
+              <dt class="col">Tipul de asigurare:</dt>
+              <dd class="col">{{order.insurance.title}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col">Persoana:</dt>
+              <dd class="col">{{order.firstName}} {{order.lastName}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col">Prețul total:</dt>
+              <dd class="col">{{order.price}}</dd>
+            </dl>
+            <dl class="row">
+              <dt class="col">Nr. de telefon:</dt>
+              <dd class="col">{{order.phoneNo}}</dd>
+            </dl>
+          </div>
+
+          <div class="card-footer mb-3" style="color: darkorange">
+            <div class="card-text float-left">{{order.status}}</div>
+            <div class="float-right">
+              <button
+                class="btn btn-primary btn-sm"
+                data-toggle="modal"
+                data-target="#exampleModal"
+                (click)="getOrderDetails(order.id)"
+              >
+                Detalii
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <pagination-controls id="first" (pageChange)="p1 = $event"></pagination-controls>
+    </div>
+
+    <div class="tab-pane fade mt-3" id="nav-history" role="tabpanel" aria-labelledby="nav-history-tab">
+      <nav>
+        <div class="nav nav-tabs" id="nav-historyTabs" role="tablist">
+          <a class="nav-item nav-link active" id="nav-approved-tab" data-toggle="tab" href="#nav-approved" role="tab" aria-controls="nav-approved" aria-selected="true">Approved</a>
+          <a class="nav-item nav-link" id="nav-declined-tab" data-toggle="tab" href="#nav-declined" role="tab" aria-controls="nav-declined" aria-selected="false">Declined</a>
+        </div>
+      </nav>
+      <div class="tab-content" id="nav-historyContent">
+        <div class="tab-pane fade show active" id="nav-approved" role="tabpanel" aria-labelledby="nav-approved-tab">
+          <div class="d-flex mt-2">
+            <div class="mr-auto p-2 mt-2">
+              <form class="form-inline">
+                <label class="mr-2" for="approvedSearchInput">Search:</label>
+                <input
+                  [(ngModel)]="approvedSearchText"
+                  class="form-control"
+                  id="approvedSearchInput"
+                  name="approvedSearchInput"
+                  placeholder="Insert any text"
+                  type="text"
+                >
+              </form>
+            </div>
+
+            <div class="mr-auto p-2 align-items-center mt-sm-2">
+              <pagination-controls (pageChange)="p2 = $event" id="second"></pagination-controls>
+            </div>
+
+            <form class="form-inline">
+              <div class="input-group">
+                <label class="mr-2" for="approvedOrdersSortBySelect">Sort by:</label>
+                <select
+                  [(ngModel)]="sortingMethod"
+                  class="form-control"
+                  id="approvedOrdersSortBySelect"
+                  name="sortBySelect"
+                >
+                  <option>Date</option>
+                </select>
+              </div>
+
+              <div class="input-group mx-3">
+                <label class="mr-2" for="approvedOrdersOrderSelect">Order:</label>
+                <select
+                  [(ngModel)]="orderMethod"
+                  class="form-control"
+                  id="approvedOrdersOrderSelect"
+                  name="orderSelect"
+                >
+                  <option>Ascending</option>
+                  <option>Descending</option>
+                </select>
+              </div>
+
+              <button (click)="dateSort(approvedOrders)" class="btn btn-primary btn-sm">Sort</button>
+            </form>
+          </div>
+
+          <div class="d-flex flex-row flex-wrap">
+            <div *ngIf="approvedOrders === undefined || approvedOrders.length === 0" class="mx-5 my-3">
+              No orders.
+            </div>
+            <div
+              *ngFor="let order of (approvedOrders | filter: approvedSearchText | paginate: { itemsPerPage: 9, currentPage: p2, id: 'second' })"
+              class="card card-block col-md-4 my-2">
+              <div class="card-header mt-3">
+                <div class="card-text float-left text-muted">#{{order.id}}</div>
+                <div class="card-text float-right text-muted">{{order.time_created | date: 'medium'}}</div>
+              </div>
+
+              <div class="card-body">
+                <dl class="row">
+                  <dt class="col">Tipul de asigurare:</dt>
+                  <dd class="col">{{order.insurance.title}}</dd>
+                </dl>
+                <dl class="row">
+                  <dt class="col">Persoana:</dt>
+                  <dd class="col">{{order.firstName}} {{order.lastName}}</dd>
+                </dl>
+                <dl class="row">
+                  <dt class="col">Prețul total:</dt>
+                  <dd class="col">{{order.price}}</dd>
+                </dl>
+                <dl class="row">
+                  <dt class="col">Nr. de telefon:</dt>
+                  <dd class="col">{{order.phoneNo}}</dd>
+                </dl>
+              </div>
+
+              <div class="card-footer mb-3" style="color: green">
+                <div class="card-text float-left">{{order.status}}</div>
+                <div class="float-right">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    data-toggle="modal"
+                    data-target="#exampleModal"
+                    (click)="getOrderDetails(order.id)"
+                  >
+                    Detalii
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <pagination-controls id="second" (pageChange)="p2 = $event"></pagination-controls>
+        </div>
+
+        <div class="tab-pane fade" id="nav-declined" role="tabpanel" aria-labelledby="nav-declined-tab">
+          <div class="d-flex justify-content-end mt-2">
+            <div class="mr-auto p-2 mt-2">
+              <form class="form-inline">
+                <label class="mr-2" for="declinedSearchInput">Search:</label>
+                <input
+                  [(ngModel)]="declinedSearchText"
+                  class="form-control"
+                  id="declinedSearchInput"
+                  name="declinedSearchInput"
+                  placeholder="Insert any text"
+                  type="text"
+                >
+              </form>
+            </div>
+
+            <div class="mr-auto p-2 align-items-center mt-sm-2">
+              <pagination-controls (pageChange)="p3 = $event" id="third"></pagination-controls>
+            </div>
+
+            <form class="form-inline">
+              <div class="input-group">
+                <label class="mr-2" for="declinedOrdersSortBySelect">Sort by:</label>
+                <select
+                  [(ngModel)]="sortingMethod"
+                  class="form-control"
+                  id="declinedOrdersSortBySelect"
+                  name="sortBySelect"
+                >
+                  <option>Date</option>
+                </select>
+              </div>
+
+              <div class="input-group mx-3">
+                <label class="mr-2" for="declinedOrdersOrderSelect">Order</label>
+                <select
+                  [(ngModel)]="orderMethod"
+                  class="form-control"
+                  id="declinedOrdersOrderSelect"
+                  name="orderSelect"
+                >
+                  <option>Ascending</option>
+                  <option>Descending</option>
+                </select>
+              </div>
+
+              <button (click)="dateSort(declinedOrders)" class="btn btn-primary btn-sm">Sort</button>
+            </form>
+          </div>
+
+          <div class="d-flex flex-row flex-wrap">
+            <div *ngIf="declinedOrders === undefined || declinedOrders.length === 0" class="mx-5 my-3">
+              No orders.
+            </div>
+            <div
+              *ngFor="let order of (declinedOrders | filter: declinedSearchText | paginate: { itemsPerPage: 9, currentPage: p3, id: 'third'})"
+              class="card card-block col-md-4 my-2">
+              <div class="card-header mt-3">
+                <div class="float-left text-muted">#{{order.id}}</div>
+                <div class="float-right text-muted">
+                  {{order.time_created | date: 'medium'}}
+                </div>
+              </div>
+
+              <div class="card-body">
+                <dl class="row">
+                  <dt class="col">Tipul de asigurare:</dt>
+                  <dd class="col">{{order.insurance.title}}</dd>
+                </dl>
+                <dl class="row">
+                  <dt class="col">Persoana:</dt>
+                  <dd class="col">{{order.firstName}} {{order.lastName}}</dd>
+                </dl>
+                <dl class="row">
+                  <dt class="col">Prețul total:</dt>
+                  <dd class="col">{{order.price}}</dd>
+                </dl>
+                <dl class="row">
+                  <dt class="col">Nr. de telefon:</dt>
+                  <dd class="col">{{order.phoneNo}}</dd>
+                </dl>
+              </div>
+
+              <div class="card-footer mb-3" style="color: red">
+                <div class="card-text float-left">{{order.status}}</div>
+                <div class="float-right">
+                  <button
+                    class="btn btn-primary btn-sm"
+                    data-toggle="modal"
+                    data-target="#exampleModal"
+                    (click)="getOrderDetails(order.id)"
+                  >
+                    Detalii
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <pagination-controls id="third" (pageChange)="p3 = $event"></pagination-controls>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Comanda nr. {{orderDetails.id}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div>
+          <dl class="row">
+            <dt class="col">Tipul de asigurare:</dt>
+            <dd class="col">{{orderDetails.insurance.title}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">Persoana:</dt>
+            <dd class="col">{{orderDetails.firstName}} {{orderDetails.lastName}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">Email:</dt>
+            <dd class="col">{{orderDetails.email}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">Nr. de telefon:</dt>
+            <dd class="col">{{orderDetails.phoneNo}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">Nr. certificatului de înmatriculare:</dt>
+            <dd class="col">{{orderDetails.docNumber}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">Nr. de înmatriculare:</dt>
+            <dd class="col">{{orderDetails.licensePlateNumber}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">IDNP:</dt>
+            <dd class="col">{{orderDetails.idnp}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">Dreptul de posesiune:</dt>
+            <dd class="col">{{orderDetails.rightOfPossesion}}</dd>
+          </dl>
+          <dl class="row">
+            <dt class="col">Status:</dt>
+            <dd class="col">
+              <div [ngStyle]="getStatusStyle()">
+                {{orderDetails.status}}
+              </div>
+              <small *ngIf="orderDetails.status !== 'PENDING'">
+                ({{orderDetails.status === 'APPROVED' ? 'Aproved' : 'Declined'}} on: {{orderDetails.time_updated | date: 'medium'}})
+              </small>
+            </dd>
+          </dl>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="text-muted mr-auto">{{orderDetails.time_created | date: 'medium'}}</div>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          data-dismiss="modal"
+          (click)="declineOrder()"
+        >
+          Decline
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          data-dismiss="modal"
+          (click)="approveOrder()"
+        >
+          Approve
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

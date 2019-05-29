@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="/">MVD-G Insurance</a>
+  <div class="dropdown" >
+    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Asigurări
+    </a>
+    <div class="dropdown-menu">
+      <div *ngIf="listOfInsurances === undefined || listOfInsurances.length === 0" class="dropdown-item">
+        Nu sunt asigurări.
+      </div>
+    <a *ngFor="let x of listOfInsurances" class="dropdown-item" href="/insurances/{{x.title}}">{{x.title}}</a>
+  </div>
+  </div>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+
+    </ul>
+
+    <div *ngIf="currentUser" class="my-2 my-lg-0">
+      <div class="dropdown">
+        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ currentUser.username }}
+        </a>
+
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <a *ngIf="currentUser" class="dropdown-item" href="/admin/profile">Profile</a>
+          <div class="dropdown-divider"></div>
+          <a *ngIf="currentUser" class="dropdown-item" href="/admin">Dashboard</a>
+          <a *ngIf="isAdmin" class="dropdown-item" href="/admin/insurances">Insurances</a>
+          <a *ngIf="isAdmin" class="dropdown-item" href="/admin/users">Users</a>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="currentUser" class="mx-3 my-2 my-lg-0">
+      <button class="btn btn-secondary" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</nav>

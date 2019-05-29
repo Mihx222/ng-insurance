@@ -1,0 +1,28 @@
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4">Bine ați venit pe MVD-G Insurance</h1>
+  </div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="card-header">Alegeți asigurarea:</div>
+
+    <div class="card-body">
+      <div class="d-flex flex-row flex-wrap">
+        <div *ngIf="insurances === undefined || insurances.length === 0">
+          Nu sunt asigurări.
+        </div>
+        <div class="col-md-4 my-2" *ngFor="let insurance of insurances">
+          <button
+            class="btn btn-primary btn-block btn-lg"
+            (click)="router.navigateByUrl('/insurances/' + insurance.title)"
+          >
+            {{insurance.title}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
