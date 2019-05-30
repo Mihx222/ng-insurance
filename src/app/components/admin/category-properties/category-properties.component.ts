@@ -8,6 +8,7 @@ import {InsuranceService} from 'src/app/service/insurance/insurance.service';
 import {Insurance} from 'src/app/model/insurance/insurance';
 import {CategoryPropertiesViewModel} from 'src/app/model/category-properties/category-propertiesViewModel';
 import {shortInsurance} from 'src/app/model/insurance/shortInsurance';
+import {InputTypeService} from '../../../service/input-type/input-type.service';
 
 @Component({
   selector: 'app-property',
@@ -32,9 +33,12 @@ export class CategoryPropertiesComponent implements OnInit {
   oldCategory: string;
   oldStatus: string;
   oldInsurance: string;
+  inputTypes;
   insuranceTitle: string = '';
   showSuccesCategory: boolean = true;
   showSuccesProperty: boolean = true;
+  selectedInputType;
+  oldInputType;
 
   constructor(
     public categoryService: CategoryService,
@@ -42,12 +46,16 @@ export class CategoryPropertiesComponent implements OnInit {
     public route: ActivatedRoute,
     public router: Router,
     public location: Location,
-    public insuranceService: InsuranceService) {
+    public insuranceService: InsuranceService,
+    public inputTypeService: InputTypeService
+  ) {
     this.categoryId = +this.route.snapshot.paramMap.get('id');
   }
 
   ngOnInit() {
     this.getInsurance();
+
+    this.inputTypes = this.inputTypeService.getAllInputTypes();
   }
 
   getInsurance() {
@@ -62,6 +70,8 @@ export class CategoryPropertiesComponent implements OnInit {
               this.insuranceTitle = insurance.title;
               this.oldInsurance = insurance.title;
               this.category = category;
+              this.selectedInputType = category.inputType;
+              this.oldInputType = this.selectedInputType;
               this.category['insurance'] = insurance;
               this.oldCategory = category.title;
               this.oldStatus = category.status;
@@ -81,11 +91,13 @@ export class CategoryPropertiesComponent implements OnInit {
   updCategory() {
     if ((this.oldStatus !== this.category.status ||
       this.oldCategory !== this.category.title ||
-      this.oldInsurance !== this.insurance.title) && this.category.title.trim().length) {
+      this.oldInsurance !== this.insurance.title ||
+    this.selectedInputType !== undefined) && this.category.title.trim().length) {
       this.category['insurance'] = this.insurance;
       this.oldStatus = this.category.status;
       this.oldCategory = this.category.title;
       this.oldInsurance = this.insurance.title;
+      this.category.inputType = this.selectedInputType;
       this.categoryService.updateCategory(this.category.id, this.category).subscribe(res => {
         this.category = res;
         this.succes = 'Updated successfully !';

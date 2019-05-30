@@ -38,15 +38,29 @@
       <div class="tab-pane fade" [ngClass]="{'show active':activeTab==='calculator'}" id="nav-calculator"
            role="tabpanel" aria-labelledby="nav-calculator-tab">
         <form (ngSubmit)="getPrice()">
-          <div class="card-footer mt-3 form-group" *ngFor="let category of displayedCategories; index as i">
+          <div *ngFor="let category of displayedCategories; index as i" class="card-footer mt-3 form-group">
             <div *ngIf="showFlag">
               <div class="row">{{category.title}}
               </div>
-              <div class="btn-group-toggle row" data-toggle="buttons" role="group">
-                <label class="btn btn-secondary" (click)="nextElement($event, i, pId)"
-                       *ngFor="let property of category.properties; index as pId">
-                  <input type="radio" name="{{property.id}}">{{property.title}}
+              <div *ngIf="category.inputType === InputTypes[InputTypes.RADIO]" class="btn-group-toggle row" data-toggle="buttons"
+                   role="group">
+                <label (click)="nextElement(i, pId)" *ngFor="let property of category.properties; index as pId"
+                       class="btn btn-secondary">
+                  <input name="{{property.id}}" type="radio">{{property.title}}
                 </label>
+              </div>
+              <div *ngIf="category.inputType === InputTypes[InputTypes.DROPDOWN]" class="btn-group-toggle row">
+                <label>
+                  <select #selectComponent class="selectpicker" (change)="nextElement(i, selectComponent.selectedIndex - 1)" data-live-search="true">
+                    <option selected hidden>Alegeți o opțiune</option>
+                    <option *ngFor="let property of category.properties; index as pId" value="{{pId}}">
+                        {{property.title}}
+                      </option>
+                    </select>
+                </label>
+              </div>
+              <div  *ngIf="category.inputType === InputTypes[InputTypes.RANGE]" class="btn-group-toggle row" role="group">
+                <ng5-slider #sliderComponent (userChangeEnd)="nextElement(i, getLegendFromSliderOption(sliderComponent.value, i))" [(value)]="sliderValue[i]" [options]="sliderOptions[i]"></ng5-slider>
               </div>
             </div>
           </div>
